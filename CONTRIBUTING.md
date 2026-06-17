@@ -1,11 +1,6 @@
+## [nvbangg/builder-for-morphe](https://github.com/nvbangg/builder-for-morphe)
+
 <div align="center">
-<a href="#-features"><img src="https://readme-typing-svg.demolab.com/?font=Google+Sans&size=25&pause=1000&color=4500FF&center=true&vCenter=true&random=false&width=550&lines=%F0%9F%93%A6+Pre-built+APKs+from+various+patch+sources"></a>
-
-[![Build Status](https://img.shields.io/github/actions/workflow/status/krvstek/uni-apks/ci.yml?style=flat-square&logo=githubactions&logoColor=%23FFFFFF&label=Build%20Status&color=%234500FF)](https://github.com/krvstek/uni-apks/actions/workflows/ci.yml)   [![Python 3.13](https://img.shields.io/badge/Python-3.13+-4500FF?style=flat-square&logo=python&logoColor=%23FFFFFF)](https://www.python.org/downloads/)   [![Telegram](https://img.shields.io/badge/Telegram-Channel-4500FF?style=flat-square&logo=telegram&logoColor=%23FFFFFF)](https://t.me/uni_apks)
-<br>
-[![Downloads](https://img.shields.io/github/downloads/krvstek/uni-apks/total?style=flat-square&logo=simpleanalytics&logoColor=%23FFFFFF&label=Downloads&color=%234500FF)](https://github.com/krvstek/uni-apks#-list-of-apps-in-this-repository)   [![Views](https://hitscounter.dev/api/hit?url=https%3A%2F%2Fgithub.com%2Fkrvstek%2Funi-apks&label=Views&icon=eye-fill&color=%234500ff&message=&style=flat-square&tz=Europe%2FWarsaw)](https://github.com/krvstek/uni-apks#-list-of-apps-in-this-repository)
-<br>
-
 Here you will find a step-by-step technical guide on how to set up your environment, run the patching script, customize the build configuration, and contribute to the project's development.
 </div>
 
@@ -21,8 +16,8 @@ Here you will find a step-by-step technical guide on how to set up your environm
 2. 📥 **Installation**:
 
 ```bash
-git clone --depth 1 https://github.com/krvstek/uni-apks.git
-cd uni-apks
+git clone --depth 1 https://github.com/nvbangg/builder-for-morphe.git
+cd builder-for-morphe
 ```
 
 No further setup needed, as `uv` handles the Python environment and dependencies automatically.
@@ -108,18 +103,6 @@ A list of keyword strings to search for in the release notes. If not specified, 
 4. ➕ **Adding a new patch source**:
 
 - Add your app entries to `config.toml` with the appropriate `patches-source` and `brand` fields (see the configuration table above for all available options).
-- Add a new job to `.github/workflows/ci.yml` so the CI picks up your brand automatically. Copy the block below and replace every occurrence of `<brand>` with your brand name in **lowercase** (must match the `brand` value set in `config.toml`):
-```yaml
-build-<brand>:
-  name: build (<brand>)
-  needs: check-versions
-  if: contains(fromJson(needs.check-versions.outputs.build_matrix), '<brand>')
-  uses: ./.github/workflows/build.yml
-  with:
-    patch_source: '<brand>'
-    filter_changelog: ${{ inputs.force_build != true }}
-  secrets: inherit
-```
 
 5. 🔑 **Keystore**:
 
@@ -157,4 +140,4 @@ Pull requests are welcome. AI-assisted contributions are accepted, but all chang
 
 ---
 
-<p align="center"><i>Maintained with ❤️ by <a href="https://github.com/krvstek">krvstek</a></i></p>
+<p align="center"><i>Maintained with ❤️ by <a href="https://github.com/krvstek">krvstek</a> and <a href="https://github.com/nvbangg">nvbangg</a></i></p>
