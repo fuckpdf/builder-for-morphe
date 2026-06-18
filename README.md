@@ -19,18 +19,20 @@ Here you can download and use applications selected for this repository, which a
 
 ## <a id="apps-list"></a> 📋 List of apps in this repository
 
-Downloads are available from [this forked repository](https://github.com/ngbangg/builder-for-morphe#apps-list) or the Telegram channel:
+Pre-built APKs are available for download from [this forked repository](https://github.com/ngbangg/builder-for-morphe#apps-list) or the Telegram channel:
 
 [![Telegram Channel](https://img.shields.io/badge/Telegram_Channel-blue?style=social&logo=telegram)](https://t.me/builder_for_morphe)　[![Group](https://img.shields.io/badge/Group-blue?style=social&logo=telegram)](https://t.me/builder_for_morphe_chat)
 
-
 ## 🤖 Build Your Own APKs
 
-For maximum security, we recommend building and customizing your own apps by:
+For maximum security, we recommend building your own APKs as follows:
 
-- Star and fork [this repo](https://github.com/nvbangg/builder-for-morphe) 👀
-- Customize [`config.toml`](config.toml) (see [`CONTRIBUTING.md`](CONTRIBUTING.md#%EF%B8%8F-configuration) for more details)
+- 🍴 `Fork` [this repo](https://github.com/nvbangg/builder-for-morphe) (don't forget to ⭐ `Star` and 👀 `Watch` it)
+- (Optional) Customize the apps you want in [`config.toml`](config.toml)
+  - See the guide in [`CONTRIBUTING.md`](CONTRIBUTING.md#%EF%B8%8F-configuration)
+  - Or simply remove the apps you don't use
 - Run the [CI workflow](../../actions/workflows/ci.yml)
+  - Make sure to allow and enable workflows first
 - Download your APKs from [Releases](../../releases)
 
 ## 📚 Documentation & Contributing
@@ -51,11 +53,10 @@ For full configuration reference, setup and contributing guide, see [CONTRIBUTIN
 
 ## 🤝 Acknowledgments
 
-This repository is based on the [krvstek/uni-apks](https://github.com/krvstek/uni-apks) template (GPL-3.0), with the following transparent changes (see [changes](https://github.com/nvbangg/builder-for-morphe/commits/main/?author=nvbangg)):
+This repository is based on the [krvstek/uni-apks](https://github.com/krvstek/uni-apks) template (GPL-3.0). See [all changes](https://github.com/nvbangg/builder-for-morphe/commits/main/?author=nvbangg):
 
 - Easily [build your own APKs](#-build-your-own-apks) just by customizing `config.toml` (no extra setup required)
   - No manual brand configuration needed in `ci.yml`
   - Automatic upstream sync (preserves your custom `config.toml`)
   - Pre-configured support for many apps
 - Other changes contributed upstream: [Pull Requests](https://github.com/krvstek/uni-apks/commits/main/?author=nvbangg), [co-authored commits](https://github.com/search?q=repo%3Akrvstek%2Funi-apks+Co-authored-by%3A+nvbangg&type=commits)
-
