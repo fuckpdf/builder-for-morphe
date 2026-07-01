@@ -44,15 +44,17 @@ def _fetch_our_releases(repo: str, net: NetworkManager) -> dict[str, str]:
         our_releases_by_brand = {}
     return our_releases_by_brand
 
-def get_matrix(source: str) -> None:
+def _load_entries() -> list:
     data = load_toml(CONFIG_PATH)
-    main_cfg = parse_config(data)
+    return parse_app_entries(data, parse_config(data))
+
+def get_matrix(source: str) -> None:
     source_lower = source.lower()
     filter_changelog = os.getenv("FILTER_CHANGELOG", "false").lower() == "true"
     patches_source = ""
     has_changelog_keywords = False
     staged: list = []
-    for entry in parse_app_entries(data, main_cfg):
+    for entry in _load_entries():
         if not entry.enabled or entry.brand.lower() != source_lower:
             continue
         if not patches_source:
@@ -88,11 +90,10 @@ def get_matrix(source: str) -> None:
     print(json.dumps({"include": include}, ensure_ascii=False))
 
 def check_builds_needed(force_all: bool = False) -> None:
-    data = load_toml(CONFIG_PATH)
-    main_cfg = parse_config(data)
     seen: dict[str, str] = {}
     dev_brands: set[str] = set()
-    for entry in parse_app_entries(data, main_cfg):
+    entries = _load_entries()
+    for entry in entries:
         if not entry.enabled:
             continue
         brand = entry.brand.lower()
@@ -114,7 +115,7 @@ def check_builds_needed(force_all: bool = False) -> None:
         abort("GITHUB_REPOSITORY environment variable is not set")
 
     entries_by_brand: dict[str, list] = {}
-    for entry in parse_app_entries(data, main_cfg):
+    for entry in entries:
         if entry.enabled:
             entries_by_brand.setdefault(entry.brand.lower(), []).append(entry)
 
@@ -146,6 +147,14 @@ def check_builds_needed(force_all: bool = False) -> None:
                     brands_to_build.append(brand)
     print(json.dumps(brands_to_build))
 
+def check_prerelease(source: str) -> None:
+    source_lower = source.lower()
+    for entry in _load_entries():
+        if entry.enabled and entry.brand.lower() == source_lower and any(spec.get("version") == "dev" for spec in entry.patches.values()):
+            print("true")
+            return
+    print("false")
+
 def main() -> None:
     _require_ci("matrix.py")
     match sys.argv[1:]:
@@ -155,8 +164,10 @@ def main() -> None:
             check_builds_needed(force_all=True)
         case ["get-matrix", source]:
             get_matrix(source)
+        case ["is-prerelease", source]:
+            check_prerelease(source)
         case _:
-            abort("Usage: matrix.py get-matrix [source] | get-matrix-force")
+            abort("Usage: matrix.py get-matrix [source] | get-matrix-force | is-prerelease [source]")
 
 if __name__ == "__main__":
     main()

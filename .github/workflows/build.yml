@@ -30,6 +30,7 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       version: ${{ steps.version.outputs.version }}
+      prerelease: ${{ steps.prerelease.outputs.prerelease }}
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
@@ -66,6 +67,10 @@ jobs:
           FILTER_CHANGELOG: ${{ inputs.filter_changelog }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: echo "matrix=$(uv run python -m src.scripts.matrix get-matrix '${{ inputs.patch_source }}')" >> "$GITHUB_OUTPUT"
+
+      - name: Check prerelease status
+        id: prerelease
+        run: echo "prerelease=$(uv run python -m src.scripts.matrix is-prerelease '${{ inputs.patch_source }}')" >> "$GITHUB_OUTPUT"
 
   run:
     needs: prepare
@@ -180,9 +185,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ needs.prepare.outputs.version }}
+          PRERELEASE: ${{ needs.prepare.outputs.prerelease }}
         run: |
           uv run python -m src.scripts.logs combine-logs logs | sed "s/{TAG}/$TAG/g" > final.md
-          gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false --title "$TAG" --notes-file final.md
+          if [ "$PRERELEASE" = "true" ]; then
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false --prerelease --title "$TAG" --notes-file final.md
+          else
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false --title "$TAG" --notes-file final.md
+          fi
 
       - name: Send Telegram notification
         if: steps.check.outputs.has_apks == 'true' && env.TG_TOKEN != '' && env.TG_CHAT != ''
