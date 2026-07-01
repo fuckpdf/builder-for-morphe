@@ -12,13 +12,18 @@ def _require_ci(script: str) -> None:
     if not IS_GITHUB:
         abort(f"'{script}' is only available in GitHub Actions")
 
-def _fetch_latest_release(source: str, net: NetworkManager) -> tuple[str, str]:
+def _fetch_latest_release(source: str, net: NetworkManager, version: str = "latest") -> tuple[str, str]:
     scheme, clean_src = source.split(":", 1)
     if scheme == "gitlab":
         project = clean_src.replace("/", "%2F")
         upstream_rel = json.loads(net.get(f"https://gitlab.com/api/v4/projects/{project}/releases/permalink/latest"))
         changelog_text = upstream_rel.get("description", "") or ""
         upstream_date = upstream_rel.get("released_at", "") or ""
+    elif version == "dev":
+        releases = json.loads(net.get(f"https://api.github.com/repos/{clean_src}/releases?per_page=1", headers=net._gh_headers))
+        upstream_rel = releases[0] if releases else {}
+        changelog_text = upstream_rel.get("body", "") or ""
+        upstream_date = upstream_rel.get("published_at", "") or ""
     else:
         upstream_rel = json.loads(net.get(f"https://api.github.com/repos/{clean_src}/releases/latest", headers=net._gh_headers))
         changelog_text = upstream_rel.get("body", "") or ""
@@ -86,12 +91,15 @@ def check_builds_needed(force_all: bool = False) -> None:
     data = load_toml(CONFIG_PATH)
     main_cfg = parse_config(data)
     seen: dict[str, str] = {}
+    dev_brands: set[str] = set()
     for entry in parse_app_entries(data, main_cfg):
         if not entry.enabled:
             continue
         brand = entry.brand.lower()
         if brand not in seen:
             seen[brand] = next(iter(entry.patches), "")
+        if any(spec["version"] == "dev" for spec in entry.patches.values()):
+            dev_brands.add(brand)
 
     if not seen:
         print(json.dumps([]))
@@ -117,7 +125,7 @@ def check_builds_needed(force_all: bool = False) -> None:
         for brand, patches_source in seen.items():
             our_date = our_releases_by_brand.get(brand, "")
             try:
-                changelog_text, upstream_date = _fetch_latest_release(patches_source, net)
+                changelog_text, upstream_date = _fetch_latest_release(patches_source, net, version="dev" if brand in dev_brands else "latest")
             except ResourceNotFoundError:
                 epr(f"No upstream release found for '{patches_source}', skipping brand '{brand}'")
                 continue
